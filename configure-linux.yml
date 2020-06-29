@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  become: false
+  tasks:
+    - include_role: 
+        name: cdougan-ansible_tower_setup_host 
+     
+- hosts: "{{ cdougan_input_hostname | default('none') }}"
+  become: true
+  tasks:
+    - include_role: 
+        name: cdougan-baseos-linux 
+    - include_role: 
+        name: cdougan-setup_rootcert
+    - include_role: 
+        name: cdougan-bigfix_agent
+    - include_role: 
+        name: cdougan-flexera
+      vars:
+        agent_action: "install"
+    - include_role: 
+        name: cdougan_splunkagent
+      vars:
+        server_mode: "{{ cdougan_input_splunktype|default('notset') }}"
